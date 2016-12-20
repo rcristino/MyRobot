@@ -7,6 +7,7 @@ class Motor:
         self.name = name
         self.motor = LargeMotor(name)
         self.direction = 1
+        self.stop()
 
     def getName(self):
         return self.name
