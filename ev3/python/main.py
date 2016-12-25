@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from classes.Motor import Motor
+from classes.MotorMock import Motor
+#from classes.MotorMock import Motor
 from time import sleep
 
 def main():
