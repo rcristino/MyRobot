@@ -46,3 +46,7 @@ class Motor:
 
     def wait(self):
         print("wait")
+
+    def __str__(self):
+        return "Motor: " + self.name + " Speed: " + str(self.speed)
+        

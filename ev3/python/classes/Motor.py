@@ -44,3 +44,6 @@ class Motor:
 
     def wait(self):
         self.motor.wait_while('running')
+
+    def __str__(self):
+        return "Motor: " + self.name + " Speed: " + str(self.speed)
