@@ -3,6 +3,7 @@
 #!/usr/bin/env python
 
 import paho.mqtt.client as mqtt
+import socket
 
 # This is the Subscriber
 
@@ -11,12 +12,12 @@ def on_connect(client, userdata, flags, rc):
   client.subscribe("topic/test")
 
 def on_message(client, userdata, msg):
-  if (msg.payload == "Hello world!"):
+  if (msg.payload.decode() == "Hello world!"):
     print("Yes!")
     #client.disconnect()
 
 client = mqtt.Client()
-client.connect("localhost",1883,60)
+client.connect(socket.gethostbyname(socket.gethostname()),1883,60)
 
 client.on_connect = on_connect
 client.on_message = on_message
