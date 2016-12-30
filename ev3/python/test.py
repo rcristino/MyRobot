@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import unittest
+from classes.MotorMock import Motor
+#from .classes.Motor import Motor
 from classes.MotorComms import MotorComms
 import paho.mqtt.client as mqtt
 import socket
@@ -21,35 +23,31 @@ class TestClientMotor:
         self.client.disconnect()
 
 
-class TestServerMotor(unittest.TestCase):
+class TestServerMotor:
+
+    def start_server(self):
+
+        self.mLeft = MotorComms("rick/mLeft", Motor("outA"))
+        self.mRight = MotorComms("rick/mRight", Motor("outD"))
+
+class TestStringMethods(unittest.TestCase):
 
     def test_motor_run(self):
-
-        mLeft = MotorComms("rick/mLeft","outA")
-        mRight = MotorComms("rick/mRight","outD")
-
-        mClient = TestClientMotor()
-        mClient.start_client()
-
-        #self.assertEqual(mLeft.isConnected(), True)
-        #self.assertEqual(mRight.isConnected(), True)
-
-        mClient.set_speed("rick/mLeft", "speed:500")
-        mClient.set_speed("rick/mRight", "speed:500")
-
-        sleep(5)
-
-        mClient.set_stop("rick/mLeft")
-        mClient.set_stop("rick/mRight")
-
-        mClient.stop_client()
-
-        mLeft.disconnect()
-        mRight.disconnect()
-
-        self.assertEqual(mLeft.isConnected(), False)
-        self.assertEqual(mRight.isConnected(), False)
-
+        print("test")
 
 if __name__ == '__main__':
-    unittest.main()
+    #unittest.main()
+    mServer = TestServerMotor()
+    mServer.start_server()
+
+    mClient = TestClientMotor()
+    mClient.start_client()
+
+    mClient.set_speed("rick/mLeft", "move:500")
+    mClient.set_speed("rick/mRight", "move:500")
+
+    sleep(1)
+    mClient.set_stop("rick/mLeft")
+    mClient.set_stop("rick/mRight")
+
+    mClient.stop_client()

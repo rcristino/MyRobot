@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-from .MotorMock import Motor
-#from .Motor import Motor
+
 import paho.mqtt.client as mqtt
 import socket
 import _thread
 
-class MotorComms(Motor):
+class MotorComms:
     def __init__(self, topic, targetMotor):
-        Motor.__init__(self, targetMotor)
         self.connection = False
         self.topic = topic
         self.targetMotor = targetMotor
@@ -40,20 +38,20 @@ class MotorComms(Motor):
     def on_message(self, client, userdata, msg):
         data = msg.payload.decode()
         if data.find("move:") == 0:
-            speed = int(data[len("speed:"):])
+            speed = int(data[len("move:"):])
             self.targetMotor.move(speed)
         elif data == "disconnect":
-            self.stopRelax()
-            self.disconnect()
+            self.targetMotor.stopRelax()
         elif data == "stop":
-            self.stop()
+            self.targetMotor.stop()
         elif data == "wait":
-            self.wait()
+            self.targetMotor.wait()
         else:
             print("Error: Unknown payload received")
+        self.disconnect()
 
     def disconnect(self):
         self.client.disconnect()
 
-    def on_loop(self):
+    def on_loop(self, topic):
         self.client.loop_forever()
