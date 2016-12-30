@@ -7,7 +7,7 @@ class Motor:
         self.motor = "Motor" + name
         self.direction = 1
         self.stop()
-        print("MotorMock")
+        print("[" + self.name + "] MotorMock create")
 
     def getName(self):
         return self.name
@@ -17,36 +17,35 @@ class Motor:
 
     def setSpeed(self, speed):
         self.speed = speed
-        print("setSeed: " + str(speed))
+        print("[" + self.name + "] setSeed: " + str(speed))
 
     def getDirection(self):
         return self.direction
 
     def setDirection(self, direction):
         self.direction = direction
-        print("setDirection")
+        print("[" + self.name + "] setDirection")
 
     def movePosition(self, position, speed, action="hold"):
         self.speed = speed * self.direction
-        print("movePosition: " + str(speed))
+        print("[" + self.name + "] " + str(speed))
 
     def moveTime(self, speed, intime):
         self.speed = speed * self.direction
-        print("moveTime: " + str(speed))
+        print("[" + self.name + "] " + str(speed))
 
     def move(self, speed):
         self.speed = speed * self.direction
-        print("move: " + str(speed))
+        print("[" + self.name + "] " + str(speed))
 
     def stopRelax(self):
-        print("stopRelax")
+        print("[" + self.name + "] stopRelax")
 
     def stop(self):
-        print("stop")
+        print("[" + self.name + "] stop")
 
     def wait(self):
-        print("wait")
+        print("[" + self.name + "] wait")
 
     def __str__(self):
-        return "Motor: " + self.name + " Speed: " + str(self.speed)
-        
+        return "[" + self.name + "] Motor: " + self.name + " Speed: " + str(self.speed)
