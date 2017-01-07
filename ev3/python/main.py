@@ -1,47 +1,59 @@
 #!/usr/bin/env python3
-#from classes.MotorMock import Motor
+from ev3dev.ev3 import *
 from classes.Motor import Motor
 from classes.Comms import ServerComms
+from classes.Display import Display
 from time import sleep
 import _thread
 
+class Rick:
+    def __init__(self):
+        print("RICK starting")
 
-def actionWorker(commsServer, mLeft, mRight):
-    print("RICK listening")
-    while(True):
-        sleep(0.1)
+        self.disp = Display()
 
-        mLeftData = commsServer.getData("mLeft")
-        mRightData = commsServer.getData("mRight")
+        self.mLeft = Motor("outA")
+        self.mRight = Motor("outD")
 
-        speedIdxLeft = mLeftData.find("move:")
-        speedIdxRight = mRightData.find("move:")
-        if speedIdxLeft is not -1:
-            speed = mLeftData[len("move:"):]
-            mLeft.move(speed)
-        if speedIdxRight is not -1:
-            speed = mRightData[len("move:"):]
-            mRight.move(speed)
-            
+        self.commsServer = ServerComms()
+        self.commsServer.subcribe(self.mLeft.getName(),"rick/mLeft")
+        self.commsServer.subcribe(self.mRight.getName(),"rick/mRight")
+
+        _thread.start_new_thread(self.motorWorker, (self.commsServer, self.mLeft, ))
+        _thread.start_new_thread(self.motorWorker, (self.commsServer, self.mRight, ))
+
+        Sound.beep().wait()
+
+    def motorWorker(self, commsServer, motor):
+        while(True):
+            sleep(0.1)
+
+            mData = self.commsServer.getData(motor.getName())
+
+            speedIdx = mData.find("move:")
+            if speedIdx is not -1:
+                speed = mData[len("move:"):]
+                motor.move(speed)
+
+            stopIdx = mData.find("stop")
+            if stopIdx is not -1:
+                motor.stop()
+
+    def shutdown(self):
+        mLeft.stopRelax()
+        mRight.stopRelax()
+
+        print("RICK stopping")
+
 def main():
-    print("RICK starting")
 
-    mLeft = Motor("outA")
-    mRight = Motor("outD")
-
-    commsServer = ServerComms()
-    commsServer.subcribe("mLeft","rick/mLeft")
-    commsServer.subcribe("mRight","rick/mRight")
-
-    _thread.start_new_thread(actionWorker, (commsServer, mLeft, mRight, ))
-
+    rick = Rick()
 
     sleep(60)
 
-    mLeft.stopRelax()
-    mRight.stopRelax()
+    rick.shutdown()
 
-    print("RICK stopping")
+
 
 
 if __name__ == "__main__":
