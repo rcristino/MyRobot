@@ -53,6 +53,9 @@ class ServerComms:
             data = self.deviceQueue[device].get()
         return data
 
+    def send(self, topic, data):
+        self.client.publish(topic, str(data).encode(),0);
+
     def disconnect(self):
         self.client.disconnect()
 

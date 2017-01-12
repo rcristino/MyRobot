@@ -3,6 +3,7 @@ import unittest
 import paho.mqtt.client as mqtt
 import socket
 from time import sleep
+import _thread
 
 class TestClientMotor:
 
@@ -10,6 +11,9 @@ class TestClientMotor:
         self.client = mqtt.Client()
         #self.client.connect(socket.gethostbyname(socket.gethostname()),1883,60)
         self.client.connect("ev3dev",1883,60)
+        self.client.on_message = self.on_message
+        self.client.subscribe("rick/radar")
+        _thread.start_new_thread(self.on_loop, (1, ))
 
     def set_speed(self, topic, speed):
         self.client.publish(topic, str(speed).encode(),0);
@@ -20,6 +24,13 @@ class TestClientMotor:
     def stop_client(self):
         self.client.disconnect()
 
+    def on_message(self, client, userdata, msg):
+        topic = msg.topic
+        data = msg.payload.decode()
+        print(data)
+
+    def on_loop(self, targetAddress):
+        self.client.loop_forever()
 
 if __name__ == '__main__':
     #unittest.main()
@@ -41,4 +52,5 @@ if __name__ == '__main__':
     mClient.set_stop("rick/mLeft")
     mClient.set_stop("rick/mRight")
 
+    sleep(10)
     mClient.stop_client()
