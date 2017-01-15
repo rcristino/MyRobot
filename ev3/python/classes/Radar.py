@@ -4,6 +4,9 @@ from time import sleep
 import _thread
 
 class Radar:
+
+    DISTANCE = "dist#"
+
     def __init__(self, rate=0.1):
         self.ir = InfraredSensor()
         self.ir.mode = 'IR-PROX'
@@ -16,6 +19,5 @@ class Radar:
     def radarWorker(self, rate):
 
         while True:
-            print("RICK: " + str(self.ir.value()) )
             self.distance = self.ir.value()
             sleep(rate)

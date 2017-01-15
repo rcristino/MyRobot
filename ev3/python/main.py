@@ -29,33 +29,34 @@ class Rick:
         _thread.start_new_thread(self.radarCommsWorker, (self.commsServer, self.radar ))
 
         Sound.beep().wait()
+        print("RICK ready")
 
     def motorCommsWorker(self, commsServer, motor):
         while(True):
             sleep(0.1)
-
             mData = self.commsServer.getData(motor.getName())
-
-            speedIdx = mData.find("move:")
-            if speedIdx is not -1:
-                speed = mData[len("move:"):]
+            if mData.find(Motor.MOVE) is not -1:
+                speed = mData[len(Motor.MOVE):]
                 motor.move(speed)
 
-            stopIdx = mData.find("stop")
-            if stopIdx is not -1:
+            if mData.find(Motor.STOP) is not -1:
                 motor.stop()
+
+            #FIXME use the topic instead of motor name
+            commsServer.send("rick/status", motor.STATE + motor.getName(), motor.getState())
 
     def radarCommsWorker(self, commsServer, radar):
         while(True):
             sleep(0.1)
-            print(radar.getDistance())
-            commsServer.send("rick/radar", radar.getDistance())
+            commsServer.send("rick/status", Radar.DISTANCE, radar.getDistance())
 
     def shutdown(self):
+        print("RICK stopping")
+
         self.mLeft.stopRelax()
         self.mRight.stopRelax()
 
-        print("RICK stopping")
+        print("RICK stoped")
 
 def main():
 

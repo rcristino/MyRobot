@@ -2,6 +2,11 @@
 from ev3dev.ev3 import *
 
 class Motor:
+
+    MOVE = "move#"
+    STOP = "stop"
+    STATE = "state#"
+
     def __init__(self, name):
         self.speed = 0
         self.name = name
@@ -44,6 +49,9 @@ class Motor:
 
     def wait(self):
         self.motor.wait_while('running')
+
+    def getState(self):
+        return self.motor.state
 
     def __str__(self):
         return "[" + self.name + "] Motor: " + self.name + " Speed: " + str(self.speed)

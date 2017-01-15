@@ -7,7 +7,7 @@ import queue
 
 class ServerComms:
 
-    def __init__(self):
+    def __init__(self, activeLog = False):
         self.connection = False
         self.targetAddress = socket.gethostbyname(socket.gethostname())
         self.client = mqtt.Client()
@@ -15,7 +15,8 @@ class ServerComms:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.on_subcribe = self.on_subcribe
-        self.client.on_log = self.on_log
+        if activeLog:
+            self.client.on_log = self.on_log
         self.topicDevice = {}
         self.deviceQueue = {}
         _thread.start_new_thread(self.on_loop, (self.targetAddress, ))
@@ -53,8 +54,11 @@ class ServerComms:
             data = self.deviceQueue[device].get()
         return data
 
-    def send(self, topic, data):
-        self.client.publish(topic, str(data).encode(),0);
+    def send(self, topic, index, data = None):
+        if data is None:
+            self.client.publish(topic, str(index).encode(),0);
+        else:
+            self.client.publish(topic, str(str(index) + str(data)).encode(),0);
 
     def disconnect(self):
         self.client.disconnect()

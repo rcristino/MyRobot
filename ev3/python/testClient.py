@@ -5,24 +5,24 @@ import socket
 from time import sleep
 import _thread
 
-class TestClientMotor:
-
-    def start_client(self):
+class CommsClient:
+    def __init__(self, targetAddress, activeLog = False):
         self.client = mqtt.Client()
-        #self.client.connect(socket.gethostbyname(socket.gethostname()),1883,60)
-        self.client.connect("ev3dev",1883,60)
+        self.client.connect(targetAddress,1883,60)
         self.client.on_message = self.on_message
-        self.client.subscribe("rick/radar")
+        if activeLog is not False:
+            self.client.on_log = self.on_log
+        self.client.subscribe("rick/status")
         _thread.start_new_thread(self.on_loop, (1, ))
-
-    def set_speed(self, topic, speed):
-        self.client.publish(topic, str(speed).encode(),0);
-
-    def set_stop(self, topic):
-        self.client.publish(topic, "stop".encode(),0);
 
     def stop_client(self):
         self.client.disconnect()
+
+    def send(self, topic, index, data = None):
+        if data is None:
+            self.client.publish(topic, str(index).encode(),0);
+        else:
+            self.client.publish(topic, str(str(index) + str(data)).encode(),0);
 
     def on_message(self, client, userdata, msg):
         topic = msg.topic
@@ -32,25 +32,38 @@ class TestClientMotor:
     def on_loop(self, targetAddress):
         self.client.loop_forever()
 
+    def on_log(mosq, obj, level, s, string):
+        print(string)
+
+
+class TestClientMotor:
+
+    def __init__(self, commsClient):
+        self.commsClient = commsClient
+
+    def set_speed(self, topic, speed):
+        self.commsClient.send(topic, "move#", speed)
+
+    def set_stop(self, topic):
+        self.commsClient.send(topic, "stop".encode(), 0);
+
 if __name__ == '__main__':
     #unittest.main()
+    commsClient = CommsClient("ev3dev")
 
-    mClient = TestClientMotor()
-    mClient.start_client()
+    mClient = TestClientMotor(commsClient)
 
     #self.assertEqual(mLeft.isConnected(), True)
     #self.assertEqual(mRight.isConnected(), True)
 
-    mClient.set_speed("rick/mLeft", "move:200")
-    mClient.set_speed("rick/mRight", "move:200")
+    #TODO  m.run_to_rel_pos(position_sp=360, speed_sp=900, stop_action="hold")
+
+    mClient.set_speed("rick/mLeft", 200)
+    mClient.set_speed("rick/mRight", 200)
 
     sleep(5)
-    mClient.set_speed("rick/mLeft", "move:0")
-    mClient.set_speed("rick/mRight", "move:0")
-
-    sleep(1)
     mClient.set_stop("rick/mLeft")
     mClient.set_stop("rick/mRight")
 
     sleep(10)
-    mClient.stop_client()
+    commsClient.stop_client()
