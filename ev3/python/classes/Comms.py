@@ -17,16 +17,14 @@ class ServerComms:
         self.client.on_subcribe = self.on_subcribe
         if activeLog:
             self.client.on_log = self.on_log
-        self.topicDevice = {}
         self.deviceQueue = {}
         _thread.start_new_thread(self.on_loop, (self.targetAddress, ))
 
     def isConnected(self):
         return self.connection
 
-    def subcribe(self, device, topic):
-        self.topicDevice[topic] = device
-        self.deviceQueue[device] = queue.Queue()
+    def subcribe(self, topic):
+        self.deviceQueue[topic] = queue.Queue()
 
     def on_log(mosq, obj, level, s, string):
         print(string)
@@ -37,7 +35,7 @@ class ServerComms:
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
             self.connection = True
-            for topic, device in self.topicDevice.items():
+            for topic in list(self.deviceQueue):
                 self.client.subscribe(topic)
         else:
             print("Error: cannot receive connection or subscribe topic")
@@ -45,13 +43,12 @@ class ServerComms:
     def on_message(self, client, userdata, msg):
         topic = msg.topic
         data = msg.payload.decode()
-        device = self.topicDevice[topic]
-        self.deviceQueue[device].put(data)
+        self.deviceQueue[topic].put(data)
 
-    def getData(self, device):
+    def getData(self, topic):
         data = ""
-        if not self.deviceQueue[device].empty():
-            data = self.deviceQueue[device].get()
+        if not self.deviceQueue[topic].empty():
+            data = self.deviceQueue[topic].get()
         return data
 
     def send(self, topic, index, data = None):

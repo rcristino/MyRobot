@@ -14,22 +14,26 @@ class Rick:
         # Motion and Display init
         self.disp = Display()
 
-        self.mLeft = Motor("outA")
-        self.mRight = Motor("outD")
+        self.mLeft = Motor("rick/mLeft", "outA")
+        self.mRight = Motor("rick/mRight", "outD")
+        self.grabber = Motor("rick/grabber", "outC", False)
 
         self.radar = Radar()
 
         # Comms Init
         self.commsServer = ServerComms()
-        self.commsServer.subcribe(self.mLeft.getName(),"rick/mLeft")
-        self.commsServer.subcribe(self.mRight.getName(),"rick/mRight")
+        self.commsServer.subcribe(self.mLeft.getName())
+        self.commsServer.subcribe(self.mRight.getName())
 
-        _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mLeft, ))
-        _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mRight, ))
-        _thread.start_new_thread(self.radarCommsWorker, (self.commsServer, self.radar ))
+        _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mLeft))
+        _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mRight))
+        _thread.start_new_thread(self.radarCommsWorker, (self.commsServer, self.radar))
 
         Sound.beep().wait()
         print("RICK ready")
+
+        #FIXME test grabber
+        self.grabber.move(100)
 
     def motorCommsWorker(self, commsServer, motor):
         while(True):
@@ -42,7 +46,6 @@ class Rick:
             if mData.find(Motor.STOP) is not -1:
                 motor.stop()
 
-            #FIXME use the topic instead of motor name
             commsServer.send("rick/status", motor.STATE + motor.getName(), motor.getState())
 
     def radarCommsWorker(self, commsServer, radar):
@@ -52,6 +55,9 @@ class Rick:
 
     def shutdown(self):
         print("RICK stopping")
+
+        #FIXME test grabber
+        self.grabber.stopRelax()
 
         self.mLeft.stopRelax()
         self.mRight.stopRelax()
