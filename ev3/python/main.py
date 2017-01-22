@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from ev3dev.ev3 import *
 from classes.Motor import Motor
+from classes.Grabber import Grabber
 from classes.Comms import ServerComms
 from classes.Display import Display
 from classes.Radar import Radar
@@ -16,7 +17,7 @@ class Rick:
 
         self.mLeft = Motor("rick/mLeft", "outA")
         self.mRight = Motor("rick/mRight", "outD")
-        self.grabber = Motor("rick/grabber", "outC", False)
+        self.grabber = Grabber("rick/grabber", "outC")
 
         self.radar = Radar()
 
@@ -27,13 +28,12 @@ class Rick:
 
         _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mLeft))
         _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mRight))
+        _thread.start_new_thread(self.grabberCommsWorker, (self.commsServer, self.grabber))
         _thread.start_new_thread(self.radarCommsWorker, (self.commsServer, self.radar))
 
         Sound.beep().wait()
         print("RICK ready")
 
-        #FIXME test grabber
-        self.grabber.move(100)
 
     def motorCommsWorker(self, commsServer, motor):
         while(True):
@@ -48,6 +48,25 @@ class Rick:
 
             commsServer.send("rick/status", motor.STATE + motor.getName(), motor.getState())
 
+    def grabberCommsWorker(self, commsServer, grabber):
+        ts = TouchSensor();
+        while(True):
+            sleep(0.1)
+
+            mData = self.commsServer.getData(grabber.getName())
+            if mData.find(Grabber.OPEN) is not -1:
+                grabber.open()
+            if mData.find(Grabber.CLOSE) is not -1:
+                grabber.close()
+
+            if(ts.value()):
+                if(grabber.getState() is Grabber.OPEN):
+                    self.grabber.close()
+                else:
+                    self.grabber.open()
+
+            commsServer.send("rick/status", Grabber.STATE, grabber.getState())
+
     def radarCommsWorker(self, commsServer, radar):
         while(True):
             sleep(0.1)
@@ -56,7 +75,7 @@ class Rick:
     def shutdown(self):
         print("RICK stopping")
 
-        #FIXME test grabber
+        self.grabber.open()
         self.grabber.stopRelax()
 
         self.mLeft.stopRelax()

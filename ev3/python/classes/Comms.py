@@ -47,7 +47,7 @@ class ServerComms:
 
     def getData(self, topic):
         data = ""
-        if not self.deviceQueue[topic].empty():
+        if topic in self.deviceQueue and not self.deviceQueue[topic].empty():
             data = self.deviceQueue[topic].get()
         return data
 

@@ -47,23 +47,36 @@ class TestClientMotor:
     def set_stop(self, topic):
         self.commsClient.send(topic, "stop".encode(), 0);
 
+class TestClientGrabber:
+
+    def __init__(self, commsClient):
+        self.commsClient = commsClient
+
+    def actionOpen(self, topic):
+        self.commsClient.send(topic, "open")
+
+    def actionClose(self, topic):
+        self.commsClient.send(topic, "close")
+
 if __name__ == '__main__':
     #unittest.main()
     commsClient = CommsClient("ev3dev")
 
     mClient = TestClientMotor(commsClient)
+    gClient = TestClientGrabber(commsClient)
 
     #self.assertEqual(mLeft.isConnected(), True)
     #self.assertEqual(mRight.isConnected(), True)
 
-    #TODO  m.run_to_rel_pos(position_sp=360, speed_sp=900, stop_action="hold")
-
     mClient.set_speed("rick/mLeft", 200)
     mClient.set_speed("rick/mRight", 200)
 
-    sleep(5)
+    gClient.actionClose("rick/grabber")
+    gClient.actionOpen("rick/grabber")
+
+
+    sleep(15)
     mClient.set_stop("rick/mLeft")
     mClient.set_stop("rick/mRight")
 
-    sleep(10)
     commsClient.stop_client()
