@@ -41,7 +41,7 @@ class Motor:
     def stop(self):
         self.motor.stop(stop_action="hold")
 
-    def wait(self):
+    def waitWhileRunning(self):
         self.motor.wait_while('running')
 
     def getState(self):

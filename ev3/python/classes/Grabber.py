@@ -4,8 +4,7 @@ from classes.Motor import Motor
 
 class Grabber(Motor):
 
-    OPEN = "open"
-    CLOSE = "close"
+    MOVE = "move"
     STATE = "state#"
     POSITION = "position#"
 
@@ -14,23 +13,24 @@ class Grabber(Motor):
         self.speed = 100
         self.posOpen = 75
         self.posClose = -75
-        self.state = Grabber.OPEN
+        self.state = "open"
 
     def getState(self):
         return self.state
 
-    def open(self):
-        if(self.state is Grabber.CLOSE):
-            self.movePosition(self.posOpen, self.speed)
-            self.state = Grabber.OPEN
-            self.wait()
-
-    def close(self):
-        if(self.state is Grabber.OPEN):
+    def move(self):
+        if(self.state is "open"):
+            self.state = "running"
             self.movePosition(self.posClose, self.speed)
-            self.state = Grabber.CLOSE
-            self.wait()
+            self.waitWhileRunning()
+            self.state = "close"
+        else:
+            self.state = "running"
+            self.movePosition(self.posOpen, self.speed)
+            self.state = "running"
+            self.waitWhileRunning()
+            self.state = "open"
 
 
     def __str__(self):
-        return "[" + self.name + "] Grabber: " + self.port + " State: " + str(self.state)
+        return "[" + self.name + "] Grabber: " + self.port + " state: " + str(self.state)

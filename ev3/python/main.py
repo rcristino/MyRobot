@@ -25,6 +25,7 @@ class Rick:
         self.commsServer = ServerComms()
         self.commsServer.subcribe(self.mLeft.getName())
         self.commsServer.subcribe(self.mRight.getName())
+        self.commsServer.subcribe(self.grabber.getName())
 
         _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mLeft))
         _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mRight))
@@ -46,26 +47,21 @@ class Rick:
             if mData.find(Motor.STOP) is not -1:
                 motor.stop()
 
-            commsServer.send("rick/status", motor.STATE + motor.getName(), motor.getState())
+            commsServer.send(motor.getName() + "/status", motor.STATE, motor.getState())
 
     def grabberCommsWorker(self, commsServer, grabber):
         ts = TouchSensor();
         while(True):
             sleep(0.1)
+            if(grabber.getState() is not "running"):
+                mData = self.commsServer.getData(grabber.getName())
+                if mData.find(Grabber.MOVE) is not -1:
+                    grabber.move()
 
-            mData = self.commsServer.getData(grabber.getName())
-            if mData.find(Grabber.OPEN) is not -1:
-                grabber.open()
-            if mData.find(Grabber.CLOSE) is not -1:
-                grabber.close()
+                if(ts.value()):
+                    grabber.move()
 
-            if(ts.value()):
-                if(grabber.getState() is Grabber.OPEN):
-                    self.grabber.close()
-                else:
-                    self.grabber.open()
-
-            commsServer.send("rick/status", Grabber.STATE, grabber.getState())
+            commsServer.send(grabber.getName() + "/status", Grabber.STATE, str(grabber.getState()))
 
     def radarCommsWorker(self, commsServer, radar):
         while(True):
@@ -75,11 +71,16 @@ class Rick:
     def shutdown(self):
         print("RICK stopping")
 
-        self.grabber.open()
+        if(not self.grabber.getState() is "close"):
+            self.grabber.move()
+
         self.grabber.stopRelax()
 
         self.mLeft.stopRelax()
         self.mRight.stopRelax()
+
+        Sound.beep().wait()
+        Sound.beep().wait()
 
         print("RICK stoped")
 
@@ -96,6 +97,9 @@ def main():
         Leds.set_color(Leds.LEFT, Leds.RED)
         Leds.set_color(Leds.RIGHT, Leds.RED)
         print("ERROR:", sys.exc_info()[0])
+        Sound.beep().wait()
+        Sound.beep().wait()
+        Sound.beep().wait()
         raise
     finally:
         rick.shutdown()
