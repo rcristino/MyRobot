@@ -19,7 +19,7 @@ class Rick:
         self.mRight = Motor("rick/mRight", "outD")
         self.grabber = Grabber("rick/grabber", "outC")
 
-        self.radar = Radar()
+        self.radar = Radar("rick/radar")
 
         # Comms Init
         self.commsServer = ServerComms()
@@ -30,10 +30,19 @@ class Rick:
         _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mLeft))
         _thread.start_new_thread(self.motorCommsWorker, (self.commsServer, self.mRight))
         _thread.start_new_thread(self.grabberCommsWorker, (self.commsServer, self.grabber))
-        _thread.start_new_thread(self.radarCommsWorker, (self.commsServer, self.radar))
+        _thread.start_new_thread(self.statusCommsWorker, (self.commsServer, self.mLeft, self.mRight, self.grabber, self.radar))
 
         Sound.beep().wait()
         print("RICK ready")
+
+
+    def statusCommsWorker(self, commsServer, mLeft, mRight, grabber, radar):
+        while(True):
+            sleep(0.1)
+            commsServer.send(mLeft.getName() + "/status", mLeft.STATE, mLeft.getState())
+            commsServer.send(mRight.getName() + "/status", mRight.STATE, mRight.getState())
+            commsServer.send(grabber.getName() + "/status", grabber.STATE, grabber.getState())
+            commsServer.send(radar.getName() + "/status", radar.DISTANCE, radar.getDistance())
 
 
     def motorCommsWorker(self, commsServer, motor):
@@ -47,7 +56,6 @@ class Rick:
             if mData.find(Motor.STOP) is not -1:
                 motor.stop()
 
-            commsServer.send(motor.getName() + "/status", motor.STATE, motor.getState())
 
     def grabberCommsWorker(self, commsServer, grabber):
         ts = TouchSensor();
@@ -57,21 +65,14 @@ class Rick:
                 mData = self.commsServer.getData(grabber.getName())
                 if mData.find(Grabber.MOVE) is not -1:
                     grabber.move()
-
-                if(ts.value()):
+                elif(ts.value()):
                     grabber.move()
 
-            commsServer.send(grabber.getName() + "/status", Grabber.STATE, str(grabber.getState()))
-
-    def radarCommsWorker(self, commsServer, radar):
-        while(True):
-            sleep(0.1)
-            commsServer.send("rick/status", Radar.DISTANCE, radar.getDistance())
 
     def shutdown(self):
         print("RICK stopping")
 
-        if(not self.grabber.getState() is "close"):
+        if(self.grabber.getState() is "close"):
             self.grabber.move()
 
         self.grabber.stopRelax()

@@ -67,7 +67,14 @@ class TestClientGrabber:
 
     def actionMove(self):
         self.commsClient.send(self.topic, "move")
-        sleep(1)
+
+
+class TestClientRadar:
+
+    def __init__(self, topic, commsClient):
+        self.topic = topic
+        self.commsClient = commsClient
+        self.commsClient.subscribe(self.topic + "/status")
 
 
 if __name__ == '__main__':
@@ -77,14 +84,13 @@ if __name__ == '__main__':
     mLeftClient = TestClientMotor("rick/mLeft", commsClient)
     mRightClient = TestClientMotor("rick/mRight", commsClient)
     gClient = TestClientGrabber("rick/grabber", commsClient)
+    radar = TestClientRadar("rick/radar", commsClient)
 
-    #self.assertEqual(mLeft.isConnected(), True)
-    #self.assertEqual(mRight.isConnected(), True)
+    self.assertEqual(mLeft.isConnected(), True)
+    self.assertEqual(mRight.isConnected(), True)
 
     mLeftClient.set_speed(200)
     mRightClient.set_speed(200)
-
-    sleep(5)
 
     gClient.actionMove()
     gClient.actionMove()
@@ -95,5 +101,5 @@ if __name__ == '__main__':
     mRightClient.set_stop()
 
     sleep(5)
-    
+
     commsClient.stop_client()
