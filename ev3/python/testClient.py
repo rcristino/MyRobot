@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import paho.mqtt.client as mqtt
+#import paho.mqtt.client as mqtt
 import socket
 from time import sleep
 import _thread
