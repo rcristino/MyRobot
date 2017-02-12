@@ -4,7 +4,7 @@ import zmq
 from zmq.log.handlers import PUBHandler
 from time import sleep
 
-def sub_logger(target="*", port=5558 , level=logging.DEBUG):
+def sub_logger(target="*", port=5500 , level=logging.DEBUG):
     ctx = zmq.Context()
     sub = ctx.socket(zmq.SUB)
     print("Logger is binding to: tcp://" + str(target) + ":" + str(port))

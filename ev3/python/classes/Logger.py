@@ -14,7 +14,7 @@ class Logger:
     isInit = False
     logQueue = queue.Queue()
 
-    def __init__(self, target, port=5558, level=logging.DEBUG):
+    def __init__(self, target, port=5500, level=logging.DEBUG):
         if Logger.isInit is False:
             self.target = target
             self.port = port
