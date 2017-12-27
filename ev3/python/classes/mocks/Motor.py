@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from time import sleep
 
 class Motor:
 
@@ -22,10 +23,10 @@ class Motor:
         self.speed = speed
 
     def movePosition(self, position, speed, action="hold"):
-        print("MOVE POSITION: Position: " + position + "[" + self.name + "] Motor: " + self.port + " Speed: " + str(self.speed))
+        print("MOVE POSITION: Position: " + str(position) + " [" + self.name + "] Motor: " + self.port + " Speed: " + str(self.speed))
 
     def moveTime(self, speed, intime):
-        print("MOVE TIME: intime: " + intime + "[" + self.name + "] Motor: " + self.port + " Speed: " + str(self.speed))
+        print("MOVE TIME: intime: " + intime + " [" + self.name + "] Motor: " + self.port + " Speed: " + str(self.speed))
 
     def move(self, speed):
         self.speed = int(speed)
@@ -39,6 +40,7 @@ class Motor:
 
     def waitWhileRunning(self):
         print("WAIT WHILE RUNNING: [" + self.name + "] Motor: " + self.port)
+        sleep(3)
 
     def getState(self):
         return "mock_running"
