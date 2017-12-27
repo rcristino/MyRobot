@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-from ev3dev.ev3 import *
 from classes.Logger import Logger
-from classes.Motor import Motor
-from classes.Grabber import Grabber
-#from classes.Comms import ServerComms
-from classes.Display import Display
-from classes.Radar import Radar
 from time import sleep
 import _thread
 import argparse
@@ -43,35 +37,26 @@ class Rick:
         #self.mLeft.stopRelax()
         #self.mRight.stopRelax()
 
-        Sound.beep().wait()
-        Sound.beep().wait()
+        Sound.doubleBeep()
 
 
-def main():
+def startup(args):
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("ip_remote", help="IP address from Control Center (e.g. 127.0.0.1)")
-    args = parser.parse_args()
     try:
         Logger(args.ip_remote)
-        Leds.set_color(Leds.LEFT, Leds.AMBER)
-        Leds.set_color(Leds.RIGHT, Leds.AMBER)
+        Led.amber()
         Logger.logInfo("RICK starting")
         rick = Rick()
         Logger.logInfo("RICK ready")
-        Sound.beep().wait()
+        Sound.beep()
 
         sleep(60) ## FIXME to be removed
 
-        Leds.set_color(Leds.LEFT, Leds.GREEN)
-        Leds.set_color(Leds.RIGHT, Leds.GREEN)
+        Led.green()
     except:
-        Leds.set_color(Leds.LEFT, Leds.RED)
-        Leds.set_color(Leds.RIGHT, Leds.RED)
+        Led.red()
         Logger.logError(sys.exc_info()[0])
-        Sound.beep().wait()
-        Sound.beep().wait()
-        Sound.beep().wait()
+        Sound.tripleBeep()
         raise
     finally:
         Logger.logInfo("RICK stopping")
@@ -79,4 +64,26 @@ def main():
         Logger.logInfo("RICK stoped")
 
 if __name__ == "__main__":
-    main()
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("ip_remote", help="IP address from Control Center (e.g. 127.0.0.1)")
+    parser.add_argument("--mocks", help="Enable Mocks fuctionaloty for development purpose (e.g. --mocks True)")
+    parser.argument_default
+    args = parser.parse_args()
+
+    if(args.mocks):
+        from classes.mocks.Motor import Motor
+        from classes.mocks.Grabber import Grabber
+        from classes.mocks.Display import Display
+        from classes.mocks.Radar import Radar
+        from classes.mocks.Sound import Sound
+        from classes.mocks.Led import Led
+    else:
+        from classes.ev3.Motor import Motor
+        from classes.ev3.Grabber import Grabber
+        from classes.ev3.Display import Display
+        from classes.ev3.Radar import Radar
+        from classes.ev3.Sound import Sound
+        from classes.ev3.Led import Led
+    
+    startup(args)

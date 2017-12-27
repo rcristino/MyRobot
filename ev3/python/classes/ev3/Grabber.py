@@ -4,7 +4,8 @@ import zmq
 import socket
 import _thread
 from time import sleep
-from classes.Motor import Motor
+from classes.ev3.Motor import Motor
+from classes.ev3.TouchSensor import TouchSensor
 from classes.Logger import Logger
 
 class Grabber(Motor):
