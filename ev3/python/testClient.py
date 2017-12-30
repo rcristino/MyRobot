@@ -1,22 +1,18 @@
 #!/usr/bin/env python
-import zmq
-import socket
-from time import sleep
-import _thread
+from classes.Comms import CommsClient
+from classes.Comms import Message
 import argparse
 
 class CommsClientGrabber:
     def __init__(self, target, port=5501):
-        self.target = "tcp://" + target + ":" + str(port)
-        self.ctx = zmq.Context()
-        self.socketReq = self.ctx.socket(zmq.REQ)
-        self.socketReq.connect(self.target)
-        print("Client Grabber connecting to: " + self.target)
+        self.grabCommsClient = CommsClient(target, port)
+        print("Client Grabber connecting to: " + self.grabCommsClient.getTarget())
 
-    def actionMove(self):
-        self.socketReq.send_string("move")
-        status = self.socketReq.recv_string()
-        print("Move command status: " + status)
+    def action(self, toOpen):
+        msg = Message("grabber",toOpen)
+        self.grabCommsClient.sendMsg(msg)
+        reply = self.grabCommsClient.recvMsg()
+        print("Grabber command status: " + reply.getName() + " : " + str(reply.getValue()))
 
 
 if __name__ == '__main__':
@@ -28,7 +24,7 @@ if __name__ == '__main__':
     grabber = CommsClientGrabber(args.ip_remote)
 
     print("close grabber")
-    grabber.actionMove()
+    grabber.action(False)
 
     print("open grabber")
-    grabber.actionMove()
+    grabber.action(True)

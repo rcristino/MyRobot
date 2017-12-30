@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import zmq
-import socket
 import _thread
 from time import sleep
 from classes.mocks.Motor import Motor
 from classes.mocks.TouchSensor import TouchSensor
 from classes.Logger import Logger
+from classes.Comms import CommsServer
+from classes.Comms import Message
 
 class Grabber(Motor):
 
@@ -20,13 +20,11 @@ class Grabber(Motor):
         self.posOpen = 75
         self.posClose = -75
         self.state = "open"
-        self.localAddress = "tcp://*:" + str(port)
-        self.ctx = zmq.Context()
-        self.socketRep = self.ctx.socket(zmq.REP)
-        self.socketRep.bind(self.localAddress)
+
+        self.grabCommsServer = CommsServer(port)
         _thread.start_new_thread(self.grabberCommsWorker, (0.1,))
         _thread.start_new_thread(self.grabberTouchWorker, (0.1,))
-        Logger.logDebug("Grabber ready: " + self.localAddress)
+        Logger.logDebug("Grabber ready: " + self.grabCommsServer.getAddress())
 
     def getState(self):
         return self.state
@@ -47,12 +45,16 @@ class Grabber(Motor):
     def grabberCommsWorker(self, interval=0.1):
         while(True):
             sleep(interval)
-            data = self.socketRep.recv_string()
-            if data.find(Grabber.MOVE) is not -1:
-                self.move()
-                self.socketRep.send_string("True")
-            else:
-                self.socketRep.send_string("False")
+            msg = self.grabCommsServer.recvMsg()
+            if msg.getName() == "grabber":
+                if msg.getValue() == True and self.state == "close":
+                    self.move()
+                    reply = Message("grabber", True)
+                    self.grabCommsServer.sendMsg(reply)
+                if msg.getValue() == False and self.state == "open":
+                    self.move()
+                    reply = Message("grabber", False)
+                    self.grabCommsServer.sendMsg(reply)
 
     def grabberTouchWorker(self, interval=0.1):
         ts = TouchSensor();
