@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import zmq
+import pickle
 import socket
 import json
 
@@ -28,7 +29,7 @@ class CommsServer:
         return self.socketRep.recv_pyobj()
 
     def sendMsg(self, obj):
-        return self.socketRep.send_pyobj(obj)
+        self.socketRep.send_pyobj(obj)
 
     def getAddress(self):
         return self.localAddress
@@ -46,7 +47,49 @@ class CommsClient:
         return self.socketReq.recv_pyobj()
 
     def sendMsg(self, obj):
-        return self.socketReq.send_pyobj(obj)
+        self.socketReq.send_pyobj(obj)
 
     def getTarget(self):
         return self.target
+
+
+class CommsPublisher:
+
+    def __init__(self, topic, port=5601):
+        self.localAddress = "tcp://*:" + str(port)
+        self.topic = topic
+        self.ctx = zmq.Context()
+        self.socketPub = self.ctx.socket(zmq.PUB)
+        self.socketPub.bind(self.localAddress)
+
+    def sendMsg(self, obj):
+        self.socketPub.send_string(self.topic, zmq.SNDMORE)
+        self.socketPub.send_pyobj(obj)
+
+    def getAddress(self):
+        return self.localAddress
+
+    def getTopic(self):
+        return self.topic
+
+
+class CommsSubcriber:
+
+    def __init__(self, target, topic, port=5601):
+        self.target = "tcp://" + target + ":" + str(port)
+        self.topic = topic
+        self.ctx = zmq.Context()
+        self.socketSub = self.ctx.socket(zmq.SUB)
+        self.socketSub.setsockopt_string(zmq.SUBSCRIBE, self.topic)
+        self.socketSub.connect(self.target)
+
+    def recvMsg(self):
+        topic = self.socketSub.recv_string()
+        msg = self.socketSub.recv_pyobj()
+        return msg
+
+    def getTarget(self):
+        return self.target
+
+    def getTopic(self):
+        return self.topic

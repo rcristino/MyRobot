@@ -5,6 +5,7 @@ from classes.mocks.Motor import Motor
 from classes.mocks.TouchSensor import TouchSensor
 from classes.Logger import Logger
 from classes.Comms import CommsServer
+from classes.Comms import CommsPublisher
 from classes.Comms import Message
 
 class Grabber(Motor):
@@ -22,6 +23,8 @@ class Grabber(Motor):
         self.state = "open"
 
         self.grabCommsServer = CommsServer(port)
+        self.grabCommsPub = CommsPublisher("grabber")
+
         _thread.start_new_thread(self.grabberCommsWorker, (0.1,))
         _thread.start_new_thread(self.grabberTouchWorker, (0.1,))
         Logger.logDebug("Grabber ready: " + self.grabCommsServer.getAddress())
@@ -51,10 +54,12 @@ class Grabber(Motor):
                     self.move()
                     reply = Message("grabber", True)
                     self.grabCommsServer.sendMsg(reply)
+                    self.grabCommsPub.sendMsg(reply)
                 if msg.getValue() == False and self.state == "open":
                     self.move()
                     reply = Message("grabber", False)
                     self.grabCommsServer.sendMsg(reply)
+                    self.grabCommsPub.sendMsg(reply)
 
     def grabberTouchWorker(self, interval=0.1):
         ts = TouchSensor();
