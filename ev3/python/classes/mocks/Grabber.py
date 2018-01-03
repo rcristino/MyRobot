@@ -14,52 +14,54 @@ class Grabber(Motor):
     STATE = "state#"
     POSITION = "position#"
 
-    def __init__(self, name, device_port, port=5501):
-        Motor.__init__(self, name, device_port, False)
+    def __init__(self, name, device_portCmd, portCmd=5501, portEvt=5502):
+        Motor.__init__(self, name, device_portCmd, False)
         self.name = name
         self.speed = 100
         self.posOpen = 75
         self.posClose = -75
         self.state = "open"
 
-        self.grabCommsServer = CommsServer(port)
-        self.grabCommsPub = CommsPublisher("grabber")
+        self.grabCommsServer = CommsServer(portCmd)
+        self.grabCommsPub = CommsPublisher(portEvt)
 
         _thread.start_new_thread(self.grabberCommsWorker, (0.1,))
         _thread.start_new_thread(self.grabberTouchWorker, (0.1,))
-        Logger.logDebug("Grabber ready: " + self.grabCommsServer.getAddress())
+        Logger.logDebug("Grabber CMDs ready: " + self.grabCommsServer.getAddress())
+        Logger.logDebug("Grabber EVTs ready: " + self.grabCommsPub.getAddress())
 
     def getState(self):
         return self.state
 
+    def updateState(self, state):
+        self.state = state
+        msg = Message("grabber", self.state)
+        self.grabCommsPub.pubEvt(msg)
+
     def move(self):
-        if(self.state is "open"):
-            self.state = "running"
+        if(self.getState() is "open"):
+            self.updateState("running")
             self.movePosition(self.posClose, self.speed)
             self.waitWhileRunning()
-            self.state = "close"
+            self.updateState("close")
         else:
-            self.state = "running"
+            self.updateState("running")
             self.movePosition(self.posOpen, self.speed)
-            self.state = "running"
             self.waitWhileRunning()
-            self.state = "open"
+            self.updateState("open")
 
     def grabberCommsWorker(self, interval=0.1):
         while(True):
-            sleep(interval)
-            msg = self.grabCommsServer.recvMsg()
-            if msg.getName() == "grabber":
-                if msg.getValue() == True and self.state == "close":
+            cmd = self.grabCommsServer.recvCmd()
+            if cmd.getName() == "grabber":
+                if cmd.getValue() == True and self.getState() == "close":
                     self.move()
-                    reply = Message("grabber", True)
-                    self.grabCommsServer.sendMsg(reply)
-                    self.grabCommsPub.sendMsg(reply)
-                if msg.getValue() == False and self.state == "open":
+                    replyCmd = Message("grabber", True)
+                    self.grabCommsServer.sendCmdReply(replyCmd)
+                if cmd.getValue() == False and self.getState() == "open":
                     self.move()
-                    reply = Message("grabber", False)
-                    self.grabCommsServer.sendMsg(reply)
-                    self.grabCommsPub.sendMsg(reply)
+                    replyCmd = Message("grabber", False)
+                    self.grabCommsServer.sendCmdReply(replyCmd)
 
     def grabberTouchWorker(self, interval=0.1):
         ts = TouchSensor();
@@ -67,6 +69,8 @@ class Grabber(Motor):
             sleep(interval)
             if(ts.value()):
                 self.move()
+                msg = Message("grabber_touch", True)
+                self.grabCommsPub.pubEvt(msg)
 
     def __str__(self):
-        return "[" + self.name + "] Grabber: " + self.port + " state: " + str(self.state)
+        return "[" + self.name + "] Grabber: " + self.portCmd + " state: " + str(self.state)

@@ -7,23 +7,24 @@ import _thread
 from time import sleep
 
 class CommsClientGrabber:
-    def __init__(self, target, port=5501):
+    def __init__(self, target, portCmd=5501, portEvt=5502):
         self.target = target
-        self.grabCommsClient = CommsClient(target, port)
-        print("Client Grabber connecting to: " + self.grabCommsClient.getTarget())
+        self.grabCommsClient = CommsClient(self.target, portCmd)
+        self.grabCommsSub = CommsSubcriber(self.target, portEvt)
+        print("Client Grabber CMDs connecting to: " + self.grabCommsClient.getTarget())
+        print("Client Grabber EVTs connecting to: " + self.grabCommsSub.getTarget())
         _thread.start_new_thread(self.workerStatus, (0.1,))
 
     def action(self, toOpen):
-        msg = Message("grabber",toOpen)
-        self.grabCommsClient.sendMsg(msg)
-        reply = self.grabCommsClient.recvMsg()
+        cmd = Message("grabber",toOpen)
+        self.grabCommsClient.sendCmd(cmd)
+        reply = self.grabCommsClient.recvCmdReply()
         print("Grabber command status: " + reply.getName() + " : " + str(reply.getValue()))
 
     def workerStatus(self, interval=0.1):
-        self.grabCoomsSub = CommsSubcriber(self.target, "grabber")
         while True:
-            sleep(interval)
-            print("EVT STATUS: " + self.grabCoomsSub.recvMsg().getName() + " -> " + str(self.grabCoomsSub.recvMsg().getValue()))
+            evt = self.grabCommsSub.recvEvt()
+            print("Grabber event: " + evt.getName() + " -> " + str(evt.getValue()))
 
 
 if __name__ == '__main__':
@@ -34,10 +35,10 @@ if __name__ == '__main__':
     # connect to grabber
     grabber = CommsClientGrabber(args.ip_remote)
 
+    sleep(3)
     print("close grabber")
     grabber.action(False)
-
+    sleep(3)
     print("open grabber")
     grabber.action(True)
-
-    sleep(10)
+    sleep(3)

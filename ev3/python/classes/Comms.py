@@ -25,10 +25,10 @@ class CommsServer:
         self.socketRep = self.ctx.socket(zmq.REP)
         self.socketRep.bind(self.localAddress)
 
-    def recvMsg(self):
+    def recvCmd(self):
         return self.socketRep.recv_pyobj()
 
-    def sendMsg(self, obj):
+    def sendCmdReply(self, obj):
         self.socketRep.send_pyobj(obj)
 
     def getAddress(self):
@@ -43,10 +43,10 @@ class CommsClient:
         self.socketReq = self.ctx.socket(zmq.REQ)
         self.socketReq.connect(self.target)
 
-    def recvMsg(self):
+    def recvCmdReply(self):
         return self.socketReq.recv_pyobj()
 
-    def sendMsg(self, obj):
+    def sendCmd(self, obj):
         self.socketReq.send_pyobj(obj)
 
     def getTarget(self):
@@ -55,41 +55,31 @@ class CommsClient:
 
 class CommsPublisher:
 
-    def __init__(self, topic, port=5601):
+    def __init__(self, port=5601):
         self.localAddress = "tcp://*:" + str(port)
-        self.topic = topic
         self.ctx = zmq.Context()
         self.socketPub = self.ctx.socket(zmq.PUB)
         self.socketPub.bind(self.localAddress)
 
-    def sendMsg(self, obj):
-        self.socketPub.send_string(self.topic, zmq.SNDMORE)
+    def pubEvt(self, obj):
         self.socketPub.send_pyobj(obj)
 
     def getAddress(self):
         return self.localAddress
 
-    def getTopic(self):
-        return self.topic
-
 
 class CommsSubcriber:
 
-    def __init__(self, target, topic, port=5601):
+    def __init__(self, target, port=5601):
         self.target = "tcp://" + target + ":" + str(port)
-        self.topic = topic
         self.ctx = zmq.Context()
         self.socketSub = self.ctx.socket(zmq.SUB)
-        self.socketSub.setsockopt_string(zmq.SUBSCRIBE, self.topic)
+        self.socketSub.setsockopt_string(zmq.SUBSCRIBE, '') # no topic or filter using ''
         self.socketSub.connect(self.target)
 
-    def recvMsg(self):
-        topic = self.socketSub.recv_string()
-        msg = self.socketSub.recv_pyobj()
-        return msg
+    def recvEvt(self):
+        evt = self.socketSub.recv_pyobj()
+        return evt
 
     def getTarget(self):
         return self.target
-
-    def getTopic(self):
-        return self.topic
