@@ -30,7 +30,16 @@ class Logger:
         logger = logging.getLogger(str(os.getpid()))
         logger.setLevel(self.level)
         handler = PUBHandler(pub)
+        formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+        handler.setFormatter(formatter)
         logger.addHandler(handler)
+
+        ### console logging 
+        # ch = logging.StreamHandler()
+        # ch.setLevel(logging.DEBUG)
+        # ch.setFormatter(formatter)
+        # logger.addHandler(ch)
+
         while Logger.isInit:
             # wait for data in queue
             data = Logger.logQueue.get()

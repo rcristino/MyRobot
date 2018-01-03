@@ -3,7 +3,6 @@ import _thread
 from time import sleep
 from classes.mocks.Motor import Motor
 from classes.mocks.TouchSensor import TouchSensor
-from classes.Logger import Logger
 from classes.Comms import CommsServer
 from classes.Comms import CommsPublisher
 from classes.Comms import Message
@@ -22,13 +21,11 @@ class Grabber(Motor):
         self.posClose = -75
         self.state = "open"
 
-        self.grabCommsServer = CommsServer(portCmd)
-        self.grabCommsPub = CommsPublisher(portEvt)
+        self.grabCommsServer = CommsServer("grabber_cmd", portCmd)
+        self.grabCommsPub = CommsPublisher("grabber_evt", portEvt)
 
         _thread.start_new_thread(self.grabberCommsWorker, (0.1,))
         _thread.start_new_thread(self.grabberTouchWorker, (0.1,))
-        Logger.logDebug("Grabber CMDs ready: " + self.grabCommsServer.getAddress())
-        Logger.logDebug("Grabber EVTs ready: " + self.grabCommsPub.getAddress())
 
     def getState(self):
         return self.state

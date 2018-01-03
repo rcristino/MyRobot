@@ -1,16 +1,18 @@
 #!/usr/bin/env python
-from classes.Comms import CommsClient
-from classes.Comms import CommsSubcriber
-from classes.Comms import Message
 import argparse
 import _thread
 from time import sleep
+import os
+import logging
+from classes.Comms import CommsClient
+from classes.Comms import CommsSubcriber
+from classes.Comms import Message
 
 class CommsClientGrabber:
     def __init__(self, target, portCmd=5501, portEvt=5502):
         self.target = target
-        self.grabCommsClient = CommsClient(self.target, portCmd)
-        self.grabCommsSub = CommsSubcriber(self.target, portEvt)
+        self.grabCommsClient = CommsClient(self.target, "test_client_cmd", portCmd)
+        self.grabCommsSub = CommsSubcriber(self.target, "test_client_evt", portEvt)
         print("Client Grabber CMDs connecting to: " + self.grabCommsClient.getTarget())
         print("Client Grabber EVTs connecting to: " + self.grabCommsSub.getTarget())
         _thread.start_new_thread(self.workerStatus, (0.1,))
@@ -36,9 +38,9 @@ if __name__ == '__main__':
     grabber = CommsClientGrabber(args.ip_remote)
 
     sleep(3)
-    print("close grabber")
+    print("test to close grabber")
     grabber.action(False)
     sleep(3)
-    print("open grabber")
+    print("test to open grabber")
     grabber.action(True)
     sleep(3)

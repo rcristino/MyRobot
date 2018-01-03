@@ -10,7 +10,7 @@ def sub_logger(target="*", port=5500 , level=logging.DEBUG):
     print("Logger is binding to: tcp://" + str(target) + ":" + str(port))
     sub.bind("tcp://" + str(target) + ":" + str(port))
     sub.setsockopt(zmq.SUBSCRIBE, b"")
-    logging.basicConfig(level=level)
+    logging.basicConfig(level=level, format='%(asctime)s | %(levelname)s | %(message)s')
 
     while True:
         level, message = sub.recv_multipart()
