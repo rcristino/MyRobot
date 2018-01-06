@@ -13,8 +13,8 @@ class Grabber(Motor):
     STATE = "state#"
     POSITION = "position#"
 
-    def __init__(self, name, device_portCmd, portCmd=5501, portEvt=5502):
-        Motor.__init__(self, name, device_portCmd, False)
+    def __init__(self, name, device_port, portCmd=5501, portEvt=5502):
+        Motor.__init__(self, name, device_port, False)
         self.name = name
         self.speed = 100
         self.posOpen = 75

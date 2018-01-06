@@ -10,21 +10,11 @@ class Rick:
         # Motion and Display init
         self.disp = Display()
 
-        #self.mLeft = Motor("rick/mLeft", "outA")
-        #self.mRight = Motor("rick/mRight", "outD")
+        self.mLeft = Move("rick/mLeft", "outA")
+        self.mRight = Move("rick/mRight", "outD")
         self.grabber = Grabber("rick/grabber", "outC")
 
         #self.radar = Radar("rick/radar")
-
-
-    # TODO update this method to report status as events
-    def statusCommsWorker(self, commsServer, mLeft, mRight, grabber, radar):
-        while(True):
-            sleep(0.1)
-            commsServer.send(mLeft.getName() + "/status", mLeft.STATE, mLeft.getState())
-            commsServer.send(mRight.getName() + "/status", mRight.STATE, mRight.getState())
-            commsServer.send(grabber.getName() + "/status", grabber.STATE, grabber.getState())
-            commsServer.send(radar.getName() + "/status", radar.DISTANCE, radar.getDistance())
 
 
     def shutdown(self):
@@ -34,8 +24,8 @@ class Rick:
 
         self.grabber.stopRelax()
 
-        #self.mLeft.stopRelax()
-        #self.mRight.stopRelax()
+        self.mLeft.stopRelax()
+        self.mRight.stopRelax()
 
         Sound.doubleBeep()
 
@@ -72,14 +62,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if(args.mocks):
-        from classes.mocks.Motor import Motor
+        from classes.mocks.Move import Move
         from classes.mocks.Grabber import Grabber
         from classes.mocks.Display import Display
         from classes.mocks.Radar import Radar
         from classes.mocks.Sound import Sound
         from classes.mocks.Led import Led
     else:
-        from classes.ev3.Motor import Motor
+        from classes.ev3.Move import Move
         from classes.ev3.Grabber import Grabber
         from classes.ev3.Display import Display
         from classes.ev3.Radar import Radar
