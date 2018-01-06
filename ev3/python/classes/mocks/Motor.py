@@ -3,6 +3,7 @@ from time import sleep
 
 class Motor:
 
+    #FIXME to be checked and deleted
     MOVE = "move#"
     STOP = "stop"
     STATE = "state#"
@@ -41,9 +42,6 @@ class Motor:
     def waitWhileRunning(self):
         print("WAIT WHILE RUNNING: [" + self.name + "] Motor: " + self.device_port)
         sleep(3)
-
-    def getState(self):
-        return "mock_running"
 
     def __str__(self):
         return "[" + self.name + "] Motor: " + self.device_port + " Speed: " + str(self.speed)

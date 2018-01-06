@@ -10,11 +10,11 @@ class Rick:
         # Motion and Display init
         self.disp = Display()
 
-        self.mLeft = Move("rick/mLeft", "outA")
-        self.mRight = Move("rick/mRight", "outD")
-        self.grabber = Grabber("rick/grabber", "outC")
+        self.mLeft = Move("motor_left", "outA", portCmd=5511, portEvt=5512)
+        self.mRight = Move("motor_right", "outD", portCmd=5521, portEvt=5522)
+        self.grabber = Grabber("grabber", "outC", portCmd=5501, portEvt=5502)
 
-        #self.radar = Radar("rick/radar")
+        #self.radar = Radar("radar")
 
 
     def shutdown(self):
