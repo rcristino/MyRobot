@@ -12,10 +12,12 @@ from classes.Logger import Logger
 from classes.Move import Move
 from classes.Grabber import Grabber
 from classes.Radar import Radar
+from classes.Comms import commsTerminate
 import traceback
 from time import sleep
 import _thread
 import argparse
+import zmq
 
 class Rick:
     def __init__(self):
@@ -39,6 +41,8 @@ class Rick:
 
         self.mLeft.stopRelax()
         self.mRight.stopRelax()
+    
+        commsTerminate()
 
         Sound.doubleBeep()
 
@@ -52,10 +56,10 @@ def startup(args):
         rick = Rick()
         Logger.logInfo("RICK ready")
         Sound.beep()
+        Led.green()
 
         sleep(60) ## FIXME to be removed
 
-        Led.green()
     except:
         Led.red()
         Logger.logError(traceback.format_exc().splitlines())
@@ -63,7 +67,6 @@ def startup(args):
     finally:
         Logger.logInfo("RICK stopping")
         rick.shutdown()
-        Logger.logInfo("RICK stoped")
 
 if __name__ == "__main__":
     

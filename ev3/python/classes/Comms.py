@@ -5,6 +5,9 @@ import socket
 import json
 from classes.Logger import Logger
 
+def commsTerminate():
+    zmq.Context().destroy()
+
 class Message():
 
     def __init__(self, name, value):
