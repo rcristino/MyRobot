@@ -51,6 +51,20 @@ class CommsClientMove:
             evt = self.moveCommsSub.recvEvt()
             print("Move event: " + evt.getName() + " -> " + str(evt.getValue()))
 
+class CommsClientRadar:
+    def __init__(self, name, target, portEvt=5532):
+        self.target = target
+        self.name = name
+        self.radarCommsSub = CommsSubcriber(self.target, "test_radar_evt", portEvt)
+        print("Client Radar EVTs connecting to: " + self.radarCommsSub.getTarget())
+        _thread.start_new_thread(self.workerStatus, (0.1,))
+
+    def workerStatus(self, interval=0.1):
+        while True:
+            evt = self.radarCommsSub.recvEvt()
+            print("Radar event: " + evt.getName() + " -> " + str(evt.getValue()))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("ip_remote", help="IP address from the Robot (e.g. 127.0.0.1)")
@@ -60,6 +74,7 @@ if __name__ == '__main__':
     grabber = CommsClientGrabber(args.ip_remote, portCmd=5501, portEvt=5502)
     mLeft = CommsClientMove("motor_left", args.ip_remote, portCmd=5511, portEvt=5512)
     mRight = CommsClientMove("motor_right", args.ip_remote, portCmd=5521, portEvt=5522)
+    radar = CommsClientRadar("radar", args.ip_remote, portEvt=5532)
 
     sleep(3)
     print("test to close grabber")

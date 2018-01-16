@@ -2,6 +2,7 @@
 from classes.Logger import Logger
 from classes.Move import Move
 from classes.Grabber import Grabber
+from classes.Radar import Radar
 from time import sleep
 import _thread
 import argparse
@@ -16,7 +17,7 @@ class Rick:
         self.mRight = Move("motor_right", "outD", portCmd=5521, portEvt=5522)
         self.grabber = Grabber("grabber", "outC", portCmd=5501, portEvt=5502)
 
-        #self.radar = Radar("radar")
+        self.radar = Radar()
 
 
     def shutdown(self):
@@ -65,12 +66,10 @@ if __name__ == "__main__":
 
     if(args.mocks):
         from classes.mocks.Display import Display
-        from classes.mocks.Radar import Radar
         from classes.mocks.Sound import Sound
         from classes.mocks.Led import Led
     else:
         from classes.ev3.Display import Display
-        from classes.ev3.Radar import Radar
         from classes.ev3.Sound import Sound
         from classes.ev3.Led import Led
     
