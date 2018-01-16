@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-import _thread
-from time import sleep
-from classes.mocks.Motor import Motor
+import sys
+if('ev3dev' in sys.modules):
+    from classes.ev3.Motor import Motor
+else:
+    from classes.mocks.Motor import Motor
 from classes.Comms import CommsServer
 from classes.Comms import CommsPublisher
 from classes.Comms import Message
+import _thread
+from time import sleep
 
 class Move(Motor):
 

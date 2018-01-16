@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
+import sys
+if('ev3dev' in sys.modules):
+    from classes.ev3.Display import Display
+    from classes.ev3.Sound import Sound
+    from classes.ev3.Led import Led
+else:
+    from classes.mocks.Display import Display
+    from classes.mocks.Sound import Sound
+    from classes.mocks.Led import Led
 from classes.Logger import Logger
 from classes.Move import Move
 from classes.Grabber import Grabber
 from classes.Radar import Radar
+import traceback
 from time import sleep
 import _thread
 import argparse
@@ -48,9 +58,8 @@ def startup(args):
         Led.green()
     except:
         Led.red()
-        Logger.logError(sys.exc_info()[0])
+        Logger.logError(traceback.format_exc().splitlines())
         Sound.tripleBeep()
-        raise
     finally:
         Logger.logInfo("RICK stopping")
         rick.shutdown()
@@ -60,17 +69,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
     parser.add_argument("ip_remote", help="IP address from Control Center (e.g. 127.0.0.1)")
-    parser.add_argument("--mocks", help="Enable Mocks fuctionaloty for development purpose (e.g. --mocks True)")
     parser.argument_default
     args = parser.parse_args()
-
-    if(args.mocks):
-        from classes.mocks.Display import Display
-        from classes.mocks.Sound import Sound
-        from classes.mocks.Led import Led
-    else:
-        from classes.ev3.Display import Display
-        from classes.ev3.Sound import Sound
-        from classes.ev3.Led import Led
     
     startup(args)

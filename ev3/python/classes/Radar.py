@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
+import sys
+if('ev3dev' in sys.modules):
+    from classes.ev3.IRSensor import IRSensor
+else:
+    from classes.mocks.IRSensor import IRSensor
 from time import sleep
 import _thread
-from classes.mocks.IRSensor import IRSensor
+
 from classes.Comms import CommsPublisher
 from classes.Comms import Message
 
