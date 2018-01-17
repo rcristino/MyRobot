@@ -4,6 +4,8 @@ import _thread
 from time import sleep
 import os
 import logging
+import sys
+sys.path.append("../")
 from classes.Comms import CommsClient
 from classes.Comms import CommsSubcriber
 from classes.Comms import Message
