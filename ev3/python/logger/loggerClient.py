@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 import logging
+import os
 import zmq
 from zmq.log.handlers import PUBHandler
 from time import sleep
 
-def sub_logger(target="*", port=5500 , level=logging.DEBUG):
+def sub_logger(target="127.0.0.1", port=5500 , level=logging.DEBUG):
     ctx = zmq.Context()
     sub = ctx.socket(zmq.SUB)
-    print("Logger is binding to: tcp://" + str(target) + ":" + str(port))
-    sub.bind("tcp://" + str(target) + ":" + str(port))
+    print("Logger is connecting to: tcp://" + str(target) + ":" + str(port))
+    sub.connect("tcp://" + str(target) + ":" + str(port))
     sub.setsockopt(zmq.SUBSCRIBE, b"")
     logging.basicConfig(level=level, format='%(asctime)s | %(levelname)s | %(message)s')
 
@@ -23,4 +24,4 @@ def sub_logger(target="*", port=5500 , level=logging.DEBUG):
 
 
 if __name__ == '__main__':
-    sub_logger()
+    sub_logger(os.environ['TARGET'])

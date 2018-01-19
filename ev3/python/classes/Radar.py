@@ -30,8 +30,11 @@ class Radar:
         return self.distance
 
     def radarWorker(self, rate):
+        oldDistance = 0
         while True:
             self.distance = self.ir.getValue()
             msg = Message(self.name, self.distance)
-            self.radarCommsPub.pubEvt(msg)
+            if oldDistance != self.distance:
+                self.radarCommsPub.pubEvt(msg)
+                oldDistance = self.distance
             sleep(rate)

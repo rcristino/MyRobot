@@ -3,7 +3,7 @@ from ev3dev.ev3 import *
 
 class IRSensor:
 
-    def __init__(self, mode='IR-PROX', rate=0.1):
+    def __init__(self, mode='IR-PROX'):
         self.ir = InfraredSensor()
         self.ir.mode = mode
 

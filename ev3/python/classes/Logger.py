@@ -14,19 +14,19 @@ class Logger:
     isInit = False
     logQueue = queue.Queue()
 
-    def __init__(self, target, port=5500, level=logging.DEBUG):
+    def __init__(self, port=5500, level=logging.DEBUG):
         if Logger.isInit is False:
-            self.target = target
             self.port = port
             self.level = level
             Logger.isInit = True
-            _thread.start_new_thread(self.log_worker, (self.target, self.port,))
+            _thread.start_new_thread(self.log_worker, (self.port,))
+            sleep(1) # it gives time to have the connection ready
 
-    def log_worker(self, target, port):
+    def log_worker(self, port):
         ctx = zmq.Context()
         pub = ctx.socket(zmq.PUB)
-        print("Logger is connecting to: tcp://" + target + ":" + str(port))
-        pub.connect("tcp://" + target + ":" + str(port))
+        print("Logger: tcp://*:" + str(port))
+        pub.bind("tcp://*:" + str(port))
         logger = logging.getLogger(str(os.getpid()))
         logger.setLevel(self.level)
         handler = PUBHandler(pub)

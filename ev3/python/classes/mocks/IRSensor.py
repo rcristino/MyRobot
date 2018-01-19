@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+from random import *
 
 class IRSensor:
 
-    def __init__(self, mode='IR-PROX', rate=0.1):
+    def __init__(self, mode='IR-PROX'):
         self.mode = mode
         print("IR INIT MODE=" + self.mode)
 
@@ -14,6 +15,6 @@ class IRSensor:
         self.mode = mode
 
     def getValue(self):
-        return 10
+        return randint(1, 50)
 
         

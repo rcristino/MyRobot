@@ -50,7 +50,7 @@ class Rick:
 def startup(args):
 
     try:
-        Logger(args.ip_remote)
+        Logger()
         Led.amber()
         Logger.logInfo("RICK starting")
         rick = Rick()
@@ -71,7 +71,6 @@ def startup(args):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("ip_remote", help="IP address from Control Center (e.g. 127.0.0.1)")
     parser.argument_default
     args = parser.parse_args()
     
