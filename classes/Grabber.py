@@ -2,10 +2,10 @@
 import sys
 if('ev3dev' in sys.modules):
     from classes.ev3.Motor import Motor
-    from classes.ev3.TouchSensor import TouchSensor
+    from classes.ev3.Touch import Touch
 else:
     from classes.mocks.Motor import Motor
-    from classes.mocks.TouchSensor import TouchSensor
+    from classes.mocks.Touch import Touch
 from classes.Comms import CommsServer
 from classes.Comms import CommsPublisher
 from classes.Comms import Message

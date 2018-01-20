@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import sys
-if('ev3dev' in sys.modules):
+import socket
+if( socket.gethostname() == "ev3dev"):
     from classes.ev3.Display import Display
     from classes.ev3.Sound import Sound
     from classes.ev3.Led import Led

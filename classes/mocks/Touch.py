@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-class TouchSensor:
+class Touch:
 
     def __init__(self):
         print("TOUCH SENSOR INIT")
