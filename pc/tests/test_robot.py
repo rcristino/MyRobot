@@ -4,81 +4,9 @@ import argparse
 import _thread
 from time import sleep
 import os
-from classes.Comms import CommsClient
-from classes.Comms import CommsSubcriber
-from classes.Comms import Message
-
-class CommsClientGrabber:
-    def __init__(self, target, portCmd=5501, portEvt=5502):
-        self.target = target
-        self.name = "grabber"
-        self.grabCommsClient = CommsClient(self.target, "test_grabber_cmd", portCmd)
-        self.grabCommsSub = CommsSubcriber(self.target, "test_grabber_evt", portEvt)
-        print("Client Grabber CMDs connecting to: " + self.grabCommsClient.getTarget())
-        print("Client Grabber EVTs connecting to: " + self.grabCommsSub.getTarget())
-        _thread.start_new_thread(self.workerStatus, (0.1,))
-
-    def getReply(self):
-        return self.reply
-
-    def getEvent(self):
-        return self.evt
-
-    def action(self, toOpen):
-        cmd = Message(self.name,toOpen)
-        self.grabCommsClient.sendCmd(cmd)
-        self.reply = self.grabCommsClient.recvCmdReply()
-        print("Grabber command status: " + self.reply.getName() + " : " + str(self.reply.getValue()))
-
-    def workerStatus(self, interval=0.1):
-        while True:
-            self.evt = self.grabCommsSub.recvEvt()
-            print("Grabber event: " + self.evt.getName() + " -> " + str(self.evt.getValue()))
-
-
-class CommsClientMove:
-    def __init__(self, name, target, portCmd=5511, portEvt=5512):
-        self.target = target
-        self.name = name
-        self.moveCommsClient = CommsClient(self.target, "test_move_cmd", portCmd)
-        self.moveCommsSub = CommsSubcriber(self.target, "test_move_evt", portEvt)
-        print("Client Move CMDs connecting to: " + self.moveCommsClient.getTarget())
-        print("Client Move EVTs connecting to: " + self.moveCommsSub.getTarget())
-        _thread.start_new_thread(self.workerStatus, (0.1,))
-
-    def getReply(self):
-        return self.reply
-
-    def getEvent(self):
-        return self.evt
-
-    def action(self, speed):
-        cmd = Message(self.name, speed)
-        self.moveCommsClient.sendCmd(cmd)
-        self.reply = self.moveCommsClient.recvCmdReply()
-        print("Move command status: " + self.reply.getName() + " : " + str(self.reply.getValue()))
-
-    def workerStatus(self, interval=0.1):
-        while True:
-            self.evt = self.moveCommsSub.recvEvt()
-            print("Move event: " + self.evt.getName() + " -> " + str(self.evt.getValue()))
-
-class CommsClientRadar:
-    def __init__(self, name, target, portEvt=5532):
-        self.target = target
-        self.name = name
-        self.radarCommsSub = CommsSubcriber(self.target, "test_radar_evt", portEvt)
-        print("Client Radar EVTs connecting to: " + self.radarCommsSub.getTarget())
-        _thread.start_new_thread(self.workerStatus, (0.1,))
-
-    def getEvent(self):
-        return self.evt
-
-    def workerStatus(self, interval=0.1):
-        while True:
-            self.evt = self.radarCommsSub.recvEvt()
-            print("Radar event: " + self.evt.getName() + " -> " + str(self.evt.getValue()))
-
+from classes.CommsClients import CommsClientGrabber
+from classes.CommsClients import CommsClientMove
+from classes.CommsClients import CommsClientRadar
 
 class TestRobot(unittest.TestCase):
 
