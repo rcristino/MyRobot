@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-class Sound:
+class Beep:
 
-    def beep():
+    def singleBeep():
         print("BEEP")
 
     def doubleBeep():

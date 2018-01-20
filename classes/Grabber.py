@@ -70,7 +70,7 @@ class Grabber(Motor):
                 self.grabCommsServer.sendCmdReply(replyCmd)
 
     def grabberTouchWorker(self, interval=0.1):
-        ts = TouchSensor();
+        ts = Touch();
         while(True):
             sleep(interval)
             if(ts.value()):

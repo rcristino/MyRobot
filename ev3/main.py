@@ -2,11 +2,11 @@
 import socket
 if( socket.gethostname() == "ev3dev"):
     from classes.ev3.Display import Display
-    from classes.ev3.Sound import Sound
+    from classes.ev3.Beep import Beep
     from classes.ev3.Led import Led
 else:
     from classes.mocks.Display import Display
-    from classes.mocks.Sound import Sound
+    from classes.mocks.Beep import Beep
     from classes.mocks.Led import Led
 from classes.Logger import Logger
 from classes.Move import Move
@@ -44,7 +44,7 @@ class Rick:
     
         commsTerminate()
 
-        Sound.doubleBeep()
+        Beep.doubleBeep()
 
 
 def startup(args):
@@ -55,7 +55,7 @@ def startup(args):
         Logger.logInfo("RICK starting")
         rick = Rick()
         Logger.logInfo("RICK ready")
-        Sound.beep()
+        Beep.singleBeep()
         Led.green()
 
         sleep(60) ## FIXME to be removed
@@ -63,7 +63,7 @@ def startup(args):
     except:
         Led.red()
         Logger.logError(traceback.format_exc().splitlines())
-        Sound.tripleBeep()
+        Beep.tripleBeep()
     finally:
         Logger.logInfo("RICK stopping")
         rick.shutdown()
