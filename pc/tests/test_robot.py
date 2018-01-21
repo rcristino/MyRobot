@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import unittest
-import argparse
 import _thread
 from time import sleep
 import os

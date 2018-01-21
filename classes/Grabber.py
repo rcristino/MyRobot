@@ -56,15 +56,14 @@ class Grabber(Motor):
     def grabberCommsWorker(self, interval=0.1):
         while(True):
             cmd = self.grabCommsServer.recvCmd()
-            if cmd.getName() == self.name:
-                if cmd.getValue() == True and self.getState() == "close":
-                    self.grabberMove()
-                    replyCmd = Message(self.name, True)
-                    self.grabCommsServer.sendCmdReply(replyCmd)
-                if cmd.getValue() == False and self.getState() == "open":
-                    self.grabberMove()
-                    replyCmd = Message(self.name, True)
-                    self.grabCommsServer.sendCmdReply(replyCmd)
+            if cmd.getName() == self.name and cmd.getValue() == True and self.getState() == "close":
+                self.grabberMove()
+                replyCmd = Message(self.name, True)
+                self.grabCommsServer.sendCmdReply(replyCmd)
+            elif cmd.getName() == self.name and cmd.getValue() == False and self.getState() == "open":
+                self.grabberMove()
+                replyCmd = Message(self.name, True)
+                self.grabCommsServer.sendCmdReply(replyCmd)
             else:
                 replyCmd = Message(self.name, False)
                 self.grabCommsServer.sendCmdReply(replyCmd)

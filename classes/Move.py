@@ -45,15 +45,14 @@ class Move(Motor):
     def moveCommsWorker(self, interval=0.1):
         while(True):
             cmd = self.moveCommsServer.recvCmd()
-            if cmd.getName() == self.name:
-                if int(cmd.getValue()) != 0 and self.getState() == "stop":
-                    self.startMove(int(cmd.getValue()))
-                    replyCmd = Message(self.name, True)
-                    self.moveCommsServer.sendCmdReply(replyCmd)
-                if int(cmd.getValue()) == 0 and self.getState() == "move":
-                    self.stopMove()
-                    replyCmd = Message(self.name, True)
-                    self.moveCommsServer.sendCmdReply(replyCmd)
+            if cmd.getName() == self.name and int(cmd.getValue()) != 0 and self.getState() == "stop":
+                self.startMove(int(cmd.getValue()))
+                replyCmd = Message(self.name, True)
+                self.moveCommsServer.sendCmdReply(replyCmd)
+            elif cmd.getName() == self.name and int(cmd.getValue()) == 0 and self.getState() == "move":
+                self.stopMove()
+                replyCmd = Message(self.name, True)
+                self.moveCommsServer.sendCmdReply(replyCmd)
             else:
                 replyCmd = Message(self.name, False)
                 self.moveCommsServer.sendCmdReply(replyCmd)
