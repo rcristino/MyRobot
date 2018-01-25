@@ -3,10 +3,12 @@ import socket
 if( socket.gethostname() == "ev3dev"):
     from classes.ev3.Display import Display
     from classes.ev3.Beep import Beep
+    from classes.ev3.Talk import Talk
     from classes.ev3.Led import Led
 else:
     from classes.mocks.Display import Display
     from classes.mocks.Beep import Beep
+    from classes.mocks.Talk import Talk
     from classes.mocks.Led import Led
 from classes.Comms import CommsServer
 from classes.Comms import Message
@@ -47,6 +49,13 @@ class Robot:
                 replyCmd = Message(self.name, True)
                 self.mainCommsServer.sendCmdReply(replyCmd)
                 self.isActive = False
+            elif cmd.getName() == self.name:
+                replyCmd = Message(self.name, True)
+                self.mainCommsServer.sendCmdReply(replyCmd)
+                Talk.say(cmd.getValue())
+            else:
+                replyCmd = Message(self.name, False)
+                self.mainCommsServer.sendCmdReply(replyCmd)
         self.shutdown()
         commsTerminate()
 

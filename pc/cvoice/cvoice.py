@@ -2,6 +2,7 @@
 import os
 from time import sleep
 import speech_recognition as sr
+from classes.CommsClients import CommsClientRobot
 from classes.CommsClients import CommsClientGrabber
 from classes.CommsClients import CommsClientMove
 
@@ -30,6 +31,7 @@ def listening():
 if __name__ == '__main__':
 
     ip_remote = os.environ['TARGET']
+    robot = CommsClientRobot("robot", ip_remote, portCmd=5000)
     mLeft = CommsClientMove("motor_left", ip_remote, portCmd=5511, portEvt=5512)
     mRight = CommsClientMove("motor_right", ip_remote, portCmd=5521, portEvt=5522)
     grabber = CommsClientGrabber(ip_remote, portCmd=5501, portEvt=5502)
@@ -38,6 +40,9 @@ if __name__ == '__main__':
     isListening = True
     while(isListening):
         cmd = str(listening())
+        if "say" in cmd:
+            print("CMD: say")
+            robot.action(cmd)
         if "move" in cmd:
             print("CMD: move")
             mLeft.action(100)
@@ -54,16 +59,27 @@ if __name__ == '__main__':
             print("CMD: left")
             mLeft.action(-100)
             mRight.action(100)
+            sleep(3)
+            mLeft.action(0)
+            mRight.action(0)            
         elif "right" in cmd:
             print("CMD: right")
             mLeft.action(100)
             mRight.action(-100)
+            sleep(3)
+            mLeft.action(0)
+            mRight.action(0)            
         elif "open" in cmd:
             print("CMD: open")
             grabber.action(True)
         elif "close" in cmd:
             print("CMD: close")
             grabber.action(False)
+        elif "shut down" in cmd:
+            print("shut down")
+            grabber.action(True)
+            robot.action()
         elif "quit" in cmd:
             print("quit")
+            grabber.action(True)
             isListening = False
