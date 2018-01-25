@@ -5,6 +5,21 @@ from classes.Comms import CommsClient
 from classes.Comms import CommsSubcriber
 from classes.Comms import Message
 
+class CommsClientRobot:
+    def __init__(self, name, target, portCmd=5000):
+        self.target = target
+        self.name = name
+        self.mainCommsClient = CommsClient(self.target, "test_robot_cmd", portCmd)
+
+    def action(self, act="shutdown"):
+        cmd = Message(self.name, act)
+        self.mainCommsClient.sendCmd(cmd)
+        self.reply = self.mainCommsClient.recvCmdReply()
+
+    def getReply(self):
+        return self.reply
+
+
 class CommsClientMove:
     def __init__(self, name, target, portCmd=5511, portEvt=5512):
         self.target = target

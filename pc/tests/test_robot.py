@@ -6,11 +6,19 @@ import os
 from classes.CommsClients import CommsClientGrabber
 from classes.CommsClients import CommsClientMove
 from classes.CommsClients import CommsClientRadar
+from classes.CommsClients import CommsClientRobot
 
 class TestRobot(unittest.TestCase):
 
     def setUp(self):
         self.ip_remote = os.environ['TARGET']
+
+    def test_rabot(self):
+        robot = CommsClientRobot("robot", self.ip_remote, portCmd=5000)
+        sleep(3)
+
+        self.assertEqual(robot.getReply().getName(), "robot")
+        self.assertEqual(robot.getReply().getValue(), True)
 
     def test_radar(self):
         radar = CommsClientRadar("radar", self.ip_remote, portEvt=5532)

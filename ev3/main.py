@@ -8,6 +8,8 @@ else:
     from classes.mocks.Display import Display
     from classes.mocks.Beep import Beep
     from classes.mocks.Led import Led
+from classes.Comms import CommsServer
+from classes.Comms import Message
 from classes.Logger import Logger
 from classes.Move import Move
 from classes.Grabber import Grabber
@@ -21,8 +23,9 @@ import zmq
 
 class Rick:
     def __init__(self):
+        self.name = "robot"
+        self.isActive = True
 
-        # Motion and Display init
         self.disp = Display()
 
         self.mLeft = Move("motor_left", "outA", portCmd=5511, portEvt=5512)
@@ -31,6 +34,21 @@ class Rick:
 
         self.radar = Radar()
 
+        self.mainCommsServer = CommsServer(self.name + "_cmd", port=5000) 
+        _thread.start_new_thread(self.mainCommsWorker, (0.1,))
+
+    def getIsActive(self):
+        return self.isActive
+
+    def mainCommsWorker(self, interval=0.1):
+        while(self.isActive):
+            cmd = self.mainCommsServer.recvCmd()
+            if cmd.getName() == self.name and int(cmd.getValue()) == "shutdown":
+                self.shutdown()
+                replyCmd = Message(self.name, True)
+                self.mainCommsServer.sendCmdReply(replyCmd)
+                commsTerminate()
+                self.grabberisActive = False
 
     def shutdown(self):
 
@@ -41,8 +59,6 @@ class Rick:
 
         self.mLeft.stopRelax()
         self.mRight.stopRelax()
-    
-        commsTerminate()
 
         Beep.doubleBeep()
 
@@ -50,6 +66,8 @@ class Rick:
 def startup(args):
 
     try:
+        isActive = True
+
         Logger()
         Led.amber()
         Logger.logInfo("RICK starting")
@@ -58,7 +76,9 @@ def startup(args):
         Beep.singleBeep()
         Led.green()
 
-        sleep(60) ## FIXME to be removed
+        # TODO add wait for interrupt
+        while(rick.getIsActive()):
+            sleep(1) 
 
     except:
         Led.red()
