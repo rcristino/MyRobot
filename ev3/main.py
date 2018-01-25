@@ -21,7 +21,7 @@ import _thread
 import argparse
 import zmq
 
-class Rick:
+class Robot:
     def __init__(self):
         self.name = "robot"
         self.isActive = True
@@ -43,12 +43,13 @@ class Rick:
     def mainCommsWorker(self, interval=0.1):
         while(self.isActive):
             cmd = self.mainCommsServer.recvCmd()
-            if cmd.getName() == self.name and int(cmd.getValue()) == "shutdown":
-                self.shutdown()
+            if cmd.getName() == self.name and cmd.getValue() == "shutdown":
                 replyCmd = Message(self.name, True)
                 self.mainCommsServer.sendCmdReply(replyCmd)
-                commsTerminate()
-                self.grabberisActive = False
+                self.isActive = False
+        self.shutdown()
+        commsTerminate()
+
 
     def shutdown(self):
 
@@ -70,14 +71,13 @@ def startup(args):
 
         Logger()
         Led.amber()
-        Logger.logInfo("RICK starting")
-        rick = Rick()
-        Logger.logInfo("RICK ready")
+        Logger.logInfo("ROBOT starting")
+        robot = Robot()
+        Logger.logInfo("ROBOT ready")
         Beep.singleBeep()
         Led.green()
 
-        # TODO add wait for interrupt
-        while(rick.getIsActive()):
+        while(robot.getIsActive()):
             sleep(1) 
 
     except:
@@ -85,8 +85,8 @@ def startup(args):
         Logger.logError(traceback.format_exc().splitlines())
         Beep.tripleBeep()
     finally:
-        Logger.logInfo("RICK stopping")
-        rick.shutdown()
+        Logger.logInfo("ROBOT stopping")
+        isActive = False
 
 if __name__ == "__main__":
     

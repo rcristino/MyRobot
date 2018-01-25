@@ -1,9 +1,9 @@
-# rick project #
+# MyRobot project #
 
 ### (work in progress...) ###
 
 ## Context ##
-rick project is a sandbox where some ideas are implemented about different
+MyRobot project is a sandbox where some ideas are implemented about different
 interfaces, workflow, communication, commands and events handling, etc.
 
 Devices:

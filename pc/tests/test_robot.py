@@ -12,15 +12,17 @@ class TestRobot(unittest.TestCase):
 
     def setUp(self):
         self.ip_remote = os.environ['TARGET']
+        self.robot = CommsClientRobot("robot", self.ip_remote, portCmd=5000)
 
-    def test_rabot(self):
-        robot = CommsClientRobot("robot", self.ip_remote, portCmd=5000)
+    def test_99_shutdown(self):
+        sleep(3)
+        self.robot.action()
         sleep(3)
 
-        self.assertEqual(robot.getReply().getName(), "robot")
-        self.assertEqual(robot.getReply().getValue(), True)
+        self.assertEqual(self.robot.getReply().getName(), "robot")
+        self.assertEqual(self.robot.getReply().getValue(), True)
 
-    def test_radar(self):
+    def test_10_radar(self):
         radar = CommsClientRadar("radar", self.ip_remote, portEvt=5532)
         print("»» PUT HAND IN FRONT OF THE RADAR ««")
         sleep(3)
@@ -28,7 +30,7 @@ class TestRobot(unittest.TestCase):
         self.assertEqual(radar.getEvent().getName(), "radar")
         self.assertTrue(radar.getEvent().getValue() > 0)
 
-    def test_grabber(self):
+    def test_20_grabber(self):
         grabber = CommsClientGrabber(self.ip_remote, portCmd=5501, portEvt=5502)
         sleep(3)
         
@@ -47,7 +49,7 @@ class TestRobot(unittest.TestCase):
         self.assertEqual(grabber.getEvent().getName(), "grabber")
         self.assertEqual(grabber.getEvent().getValue(), "open")
 
-    def test_motor(self):
+    def test_30_motor(self):
         mLeft = CommsClientMove("motor_left", self.ip_remote, portCmd=5511, portEvt=5512)
         mRight = CommsClientMove("motor_right", self.ip_remote, portCmd=5521, portEvt=5522)
 
