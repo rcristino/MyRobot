@@ -19,9 +19,8 @@ class Radar:
         self.distance = 0
         self.name = name
         self.ir = IRSensor('IR-PROX')
-        _thread.start_new_thread(self.radarWorker, (rate, ))
-        
         self.radarCommsPub = CommsPublisher(self.name + "_evt", portEvt)
+        _thread.start_new_thread(self.radarWorker, (rate, ))
 
     def getName(self):
         return self.name
@@ -30,11 +29,8 @@ class Radar:
         return self.distance
 
     def radarWorker(self, rate):
-        oldDistance = 0
         while True:
             self.distance = self.ir.getValue()
             msg = Message(self.name, self.distance)
-            if oldDistance != self.distance:
-                self.radarCommsPub.pubEvt(msg)
-                oldDistance = self.distance
+            self.radarCommsPub.pubEvt(msg)
             sleep(rate)

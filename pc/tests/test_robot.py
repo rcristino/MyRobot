@@ -24,7 +24,6 @@ class TestRobot(unittest.TestCase):
 
     def test_10_radar(self):
         radar = CommsClientRadar("radar", self.ip_remote, portEvt=5532)
-        print("»» PUT HAND IN FRONT OF THE RADAR ««")
         sleep(3)
 
         self.assertEqual(radar.getEvent().getName(), "radar")
