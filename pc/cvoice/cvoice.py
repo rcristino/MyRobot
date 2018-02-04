@@ -51,7 +51,7 @@ def collectVoiceCmds(rate=0.1):
 
 def voiceHandler(rate=0.1):
 
-    turningTime = 5 #sec
+    speed = 200
     isListening = True
 
     robot.action("at your command!")
@@ -67,30 +67,24 @@ def voiceHandler(rate=0.1):
             robot.action(cmd[len("say"):]) # remove say from the string
         elif "move" in cmd:
             print("CMD: move")
-            mLeft.action(100)
-            mRight.action(100)
+            mLeft.action(speed)
+            mRight.action(speed)
         elif "reverse" in cmd:
             print("CMD: reverse")
-            mLeft.action(-100)
-            mRight.action(-100)
+            mLeft.action(speed * -1)
+            mRight.action(speed * -1)
         elif "stop" in cmd:
             print("CMD: stop")
             mLeft.action(0)
             mRight.action(0)
         elif "left" in cmd:
             print("CMD: left")
-            mLeft.action(-100)
-            mRight.action(100)
-            sleep(turningTime) # keep moving for certain time
-            mLeft.action(0)
-            mRight.action(0)            
+            mLeft.action((speed * -1) / 2)
+            mRight.action(speed / 2)
         elif "right" in cmd:
             print("CMD: right")
-            mLeft.action(100)
-            mRight.action(-100)
-            sleep(turningTime) # keep moving for certain time
-            mLeft.action(0)
-            mRight.action(0)            
+            mLeft.action(speed / 2)
+            mRight.action((speed * -1) / 2)
         elif "open" in cmd:
             print("CMD: open")
             grabber.action(True)
