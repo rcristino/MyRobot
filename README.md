@@ -4,8 +4,8 @@ MyRobot project is a sandbox where some ideas are implemented about different
 interfaces, workflows, communication, commands, events handling, etc.
 
 List of functionalities:
-* voice commmand to move fowards, backwards, left and right
-* using IR as a radar to messure the distance. If obstacle is ahead, then it will stop
+* voice command to move forwards, backwards, left and right
+* using IR as a radar to measure the distance. If obstacle is ahead, then it will stop
 * a small wheel pointing up on the robot, it is a button. When it is pressed,  it will open or close the gripper
 * it is possible to have a logger tool connected and observe remotely all commands, events and current robot state
 
